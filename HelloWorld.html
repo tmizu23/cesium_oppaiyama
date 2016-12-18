@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Use correct character set. -->
+  <meta charset="utf-8">
+  <!-- Tell IE to use the latest, best version. -->
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Hello World!</title>
+  <script src="../Build/Cesium/Cesium.js"></script>
+  <style>
+      @import url(../Build/Cesium/Widgets/widgets.css);
+      html, body, #cesiumContainer {
+          width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      }
+ 
+  </style>
+</head>
+<body>
+<div id="cesiumContainer"></div>
+<script>
+var viewer = new Cesium.Viewer('cesiumContainer', {vrButton : true});
+
+var ortho = new Cesium.UrlTemplateImageryProvider({ 
+		url: './ortho/{z}/{x}/{reverseY}.png', 
+});
+viewer.scene.imageryLayers.addImageryProvider(ortho);
+var terrainProvider = new Cesium.CesiumTerrainProvider({
+    	url : './terrain',
+	requestVertexNormals : true
+});
+
+viewer.terrainProvider = terrainProvider;
+
+
+viewer.scene.globe.enableLighting = true;
+viewer.scene.globe.depthTestAgainstTerrain = true;
+Cesium.Math.setRandomNumberSeed(3);
+var start = Cesium.JulianDate.fromDate(new Date(2016, 11, 20, 9));
+var stop = Cesium.JulianDate.addSeconds(start, 360, new Cesium.JulianDate());
+viewer.clock.startTime = start.clone();
+viewer.clock.stopTime = stop.clone();
+viewer.clock.currentTime = start.clone();
+viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+viewer.clock.multiplier = 2.5;
+viewer.timeline.zoomTo(start, stop);
+
+function computeCirclularFlight(lon, lat, radius) {
+    var property = new Cesium.SampledPositionProperty();
+    for (var i = 0; i <= 360; i += 45) {
+        var radians = Cesium.Math.toRadians(i);
+        var time = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
+        var position = Cesium.Cartesian3.fromDegrees(lon + (radius * 1.5 * Math.cos(radians)), lat + (radius * Math.sin(radians)), 1000);
+        property.addSample(time, position);
+        viewer.entities.add({
+            position : position,
+        });
+    }
+    return property;
+}
+
+
+var position = computeCirclularFlight(140.9445306, 38.2346564, 0.035);
+var entity = viewer.entities.add({
+    availability : new Cesium.TimeIntervalCollection([new Cesium.TimeInterval({
+        start : start,
+        stop : stop
+    })]),
+    position : position,
+    orientation : new Cesium.VelocityOrientationProperty(position),   
+});
+
+entity.position.setInterpolationOptions({
+    interpolationDegree : 2,
+    interpolationAlgorithm : Cesium.HermitePolynomialApproximation
+});
+
+var camera = viewer.camera;
+camera.position = new Cesium.Cartesian3(1.0, 1.0, 1.0);
+camera.direction = new Cesium.Cartesian3(0.2, 1.0, -0.3);
+camera.up = new Cesium.Cartesian3(0.0, 0.0, 1.0);
+camera.right = new Cesium.Cartesian3(0.0, -1.0, 0.0);
+
+viewer.scene.preRender.addEventListener(function(scene, time) {
+    var position = entity.position.getValue(time);
+    if (!Cesium.defined(position)) {
+        return;
+    }
+    var transform;
+    if (!Cesium.defined(entity.orientation)) {
+        transform = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+    } else {
+        var orientation = entity.orientation.getValue(time);
+        if (!Cesium.defined(orientation)) {
+            return;
+        }
+        transform = Cesium.Matrix4.fromRotationTranslation(Cesium.Matrix3.fromQuaternion(orientation), position);
+    }
+    var offset = Cesium.Cartesian3.clone(camera.position);
+    var direction = Cesium.Cartesian3.clone(camera.direction);
+    var up = Cesium.Cartesian3.clone(camera.up);
+    camera.lookAtTransform(transform);
+    Cesium.Cartesian3.clone(offset, camera.position);
+    Cesium.Cartesian3.clone(direction, camera.direction);
+    Cesium.Cartesian3.clone(up, camera.up);
+    Cesium.Cartesian3.cross(direction, up, camera.right);
+});
+
+</script>
+</body>
+</html>
