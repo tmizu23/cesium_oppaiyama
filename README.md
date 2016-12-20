@@ -1,14 +1,13 @@
 cesium_oppaiyama
 ====================
 
-‚±‚Ì‹LŽ–‚ÉŠÖ˜A‚·‚éƒf[ƒ^‚Å‚·B
+ã“ã®è¨˜äº‹ã«é–¢é€£ã™ã‚‹ãƒ‡ãƒ¼ã‚¿ã§ã™ã€‚
 http://d.hatena.ne.jp/tmizu23/
 
 
-## markerxml2gcptxt.py‚É‚Â‚¢‚Ä
+## markerxml2gcptxt.pyã«ã¤ã„ã¦
 
-PhotoScan‚©‚çƒGƒNƒXƒ|[ƒg‚µ‚½marker.xml‚ðOpenDroneMap—p‚Égcp_list.txt‚É•ÏŠ·‚·‚éƒvƒƒOƒ‰ƒ€‚Å‚·B
-“Š‰e–@‚ÍAŽ©•ª‚Å‘‚«Š·‚¦‚Ä‚­‚¾‚³‚¢B
+PhotoScanã‹ã‚‰ã‚¨ã‚¯ã‚¹ãƒãƒ¼ãƒˆã—ãŸmarker.xmlã‚’OpenDroneMapç”¨ã«gcp_list.txtã«å¤‰æ›ã™ã‚‹ãƒ—ãƒ­ã‚°ãƒ©ãƒ ã§ã™ã€‚æŠ•å½±æ³•ã¯ã€è‡ªåˆ†ã§æ›¸ãæ›ãˆã¦ãã ã•ã„ã€‚(PhotoScanãŒã‚ã‚‹ãªã‚‰ã€ãã®ã¾ã¾PhotoScanã§å‡¦ç†ã™ã‚Œã°ã„ã„ã˜ã‚ƒãªã„ï¼Ÿã¨ã„ã†ã®ã¯ã€ãã®é€šã‚Šã§ã™ã€‚)
 ````
 python markerxml2gcptxt.py > gcp_list.txt
 ````
